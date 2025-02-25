@@ -1,0 +1,6 @@
+@prueba_idgen_HostAddress = http://localhost:5000
+
+GET {{prueba_idgen_HostAddress}}/Home/registrar
+Accept: application/json
+
+###
