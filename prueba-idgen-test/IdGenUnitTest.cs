@@ -7,23 +7,29 @@ using PruebaIdGen.Persistence;
 
 namespace prueba_idgen_test;
 
-public class UnitTest1
+public class IdGenUnitTest : IDisposable
 {
-    [Fact]
-    public void ControllerTest()
-    {
-        var _mockLogger = new Mock<ILogger<HomeController>>();
 
+    ApplicationDbContext context;
+
+    // Setup
+    public IdGenUnitTest()
+    {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseSqlite("Filename=:memory:") // SQLite en memoria
             .Options;
 
-        var context = new ApplicationDbContext(options);
+        context = new ApplicationDbContext(options);
 
         context.Database.OpenConnection();
-        context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
 
+    }
+
+    [Fact]
+    public void ControllerTest()
+    {
+        var _mockLogger = new Mock<ILogger<HomeController>>();
         var controller = new HomeController(_mockLogger.Object, context);
 
         var result = controller.Registrar();
@@ -38,19 +44,9 @@ public class UnitTest1
 
     }
 
-
     [Fact]
     public void AddTodoTest()
     {
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseSqlite("Filename=:memory:") // SQLite en memoria
-            .Options;
-
-        var context = new ApplicationDbContext(options);
-
-        context.Database.OpenConnection();
-        context.Database.EnsureDeleted();
-        context.Database.EnsureCreated();
 
         var todo = new Todo { Title = "Hello World", IsCompleted = false, Departamento = 11 };
 
@@ -64,15 +60,6 @@ public class UnitTest1
 
     [Fact]
     public void GeneratorIdTest() {
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseSqlite("Filename=:memory:") // SQLite en memoria
-            .Options;
-
-        using var context = new ApplicationDbContext(options);
-
-        context.Database.OpenConnection();
-        context.Database.EnsureDeleted();
-        context.Database.EnsureCreated();
 
         var entity = new Todo { Title = "Hello World", IsCompleted = false, Departamento = 11 };
         context.Add(entity);
@@ -102,5 +89,11 @@ public class UnitTest1
 
     }
 
+    // teardown
+    public void Dispose()
+    {
+        context.Database.EnsureDeleted();
+        context.Dispose();
+    }
 
 }
